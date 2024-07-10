@@ -1,1 +1,187 @@
+<!DOCTYPE html>
+<html>
+<style>
+@charset "UTF-8";
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:300,400,700);
 
+body {
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 300;
+  line-height: 1.42em;
+  color:#A7A1AE;
+  background-color:#1F2739;
+}
+
+h1 {
+  font-size:3em; 
+  font-weight: 300;
+  line-height:1em;
+  text-align: center;
+  color: #4DC3FA;
+}
+
+h2 {
+  font-size:1em; 
+  font-weight: 300;
+  text-align: center;
+  display: block;
+  line-height:1em;
+  padding-bottom: 2em;
+  color: #FB667A;
+}
+
+h2 a {
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #FB667A;
+  text-decoration: none;
+}
+
+.blue { color: #185875; }
+.yellow { color: #FFF842; }
+
+.container th h1 {
+    font-weight: bold;
+    font-size: 1em;
+  text-align: left;
+  color: #185875;
+}
+
+.container td {
+    font-weight: normal;
+    font-size: 1em;
+  -webkit-box-shadow: 0 2px 2px -2px #0E1119;
+     -moz-box-shadow: 0 2px 2px -2px #0E1119;
+          box-shadow: 0 2px 2px -2px #0E1119;
+}
+
+.container {
+    text-align: left;
+    overflow: hidden;
+    width: 80%;
+    margin: 0 auto;
+  display: table;
+  padding: 0 0 8em 0;
+}
+
+.container td, .container th {
+    padding-bottom: 1%;
+    padding-top: 1%;
+  padding-left:1%;  
+}
+
+/* Background-color of the odd rows */
+.container tr:nth-child(odd) {
+    background-color: #323C50;
+}
+
+/* Background-color of the even rows */
+.container tr:nth-child(even) {
+    background-color: #2C3446;
+}
+
+.container th {
+    background-color: #1F2739;
+}
+
+.container td:first-child { color: #FB667A; }
+
+.container tr:hover {
+   background-color: #464A52;
+-webkit-box-shadow: 0 6px 6px -6px #0E1119;
+     -moz-box-shadow: 0 6px 6px -6px #0E1119;
+          box-shadow: 0 6px 6px -6px #0E1119;
+}
+
+.container td:hover {
+  background-color: #FFF842;
+  color: #403E10;
+  font-weight: bold;
+  
+  box-shadow: #7F7C21 -1px 1px, #7F7C21 -2px 2px, #7F7C21 -3px 3px, #7F7C21 -4px 4px, #7F7C21 -5px 5px, #7F7C21 -6px 6px;
+  transform: translate3d(6px, -6px, 0);
+  
+  transition-delay: 0s;
+    transition-duration: 0.4s;
+    transition-property: all;
+  transition-timing-function: line;
+}
+
+@media (max-width: 800px) {
+.container td:nth-child(4),
+.container th:nth-child(4) { display: none; }
+}
+</style>
+<body>
+
+
+  <table id="optionChainTable" class="container">
+        <thead>
+            <tr>
+                <th>Strike Price</th>
+                <th>CE Open Interest</th>
+                <th>CE Change in OI</th>
+                <th>CE Volume</th>
+                <th>CE IV</th>
+                <th>CE LTP</th>
+                <th>PE Open Interest</th>
+                <th>PE Change in OI</th>
+                <th>PE Volume</th>
+                <th>PE IV</th>
+                <th>PE LTP</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+
+<script type="text/javascript">
+  document.addEventListener("DOMContentLoaded", function () {
+    const apiUrl = 'https://www.nseindia.com/api/option-chain-indices?symbol=NIFTY';
+    const tableBody = document.querySelector('#optionChainTable tbody');
+
+    async function fetchData() {
+        try {
+            const response = await fetch(apiUrl);
+            const data = await response.json();
+            updateTable(data);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
+
+    function updateTable(data) {
+        tableBody.innerHTML = ''; // Clear previous data
+
+        // Assuming data.records.data is the correct path to the option chain array
+        data.records.data.forEach(option => {
+            const row = document.createElement('tr');
+
+            row.innerHTML = `
+                <td>${option.strikePrice}</td>
+                <td>${option.CE.openInterest}</td>
+                <td>${option.CE.changeinOpenInterest}</td>
+                <td>${option.CE.totalTradedVolume}</td>
+                <td>${option.CE.impliedVolatility}</td>
+                <td>${option.CE.lastPrice}</td>
+                <td>${option.PE.openInterest}</td>
+                <td>${option.PE.changeinOpenInterest}</td>
+                <td>${option.PE.totalTradedVolume}</td>
+                <td>${option.PE.impliedVolatility}</td>
+                <td>${option.PE.lastPrice}</td>
+            `;
+
+            tableBody.appendChild(row);
+        });
+    }
+
+    // Fetch data initially
+    fetchData();
+
+    // Set interval to fetch data every 10 seconds
+    setInterval(fetchData, 10000);
+});
+</script>
+</body>
+</html>
